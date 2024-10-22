@@ -15,6 +15,7 @@ module.exports.upload_post = async (req, res) => {
       originalName: req.file.originalname,
       filePath: req.file.path,
       userId: req.userId,
+      token:uuidv4(),
     });
     await file.save();
     res.redirect("/myuploads");
