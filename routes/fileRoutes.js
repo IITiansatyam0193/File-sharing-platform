@@ -32,10 +32,10 @@ const upload = multer({ storage: storage });
 router.get("/upload" , requireAuth , fileController.upload_get);
 router.post("/upload" , requireAuth , checkUser , upload.single('file') , fileController.upload_post);
 router.get("/myuploads" , requireAuth , checkUser , fileController.myUploads_get);
-router.get("/download", checkUser , fileController.download_get);
+router.get("/download", fileController.download_get);
 router.get("/rename" , checkUser , fileController.rename_get);
 
-//SHAREING FEATURES
+//SHARING FEATURES
 router.post("/share/:fileId", fileController.share_post);
 router.get("/shared" , requireAuth , checkUser, fileController.shared_get);
 router.get("/sharedbyme" , requireAuth , checkUser , fileController.sharedByMe_get);

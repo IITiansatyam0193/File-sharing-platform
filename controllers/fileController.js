@@ -15,7 +15,7 @@ module.exports.upload_post = async (req, res) => {
       originalName: req.file.originalname,
       filePath: req.file.path,
       userId: req.userId,
-      token:uuidv4(),
+      token: uuidv4(),
     });
     await file.save();
     res.redirect("/myuploads");
@@ -168,20 +168,10 @@ module.exports.shareLink_post = async (req, res) => {
       return res.status(404).send("File not found");
     }
 
-    if (file.sharedLinkActive) {
-      const shareLink = `${req.protocol}://${req.get("host")}/download/${
-        file.token
-      }`;
-      res.send(shareLink);
-    }
-
-    const token = uuidv4(); // Generate a unique token using the uuid library
-
     file.sharedLinkActive = true;
-    file.token = token;
     await file.save();
 
-    const shareLink = `${req.protocol}://${req.get("host")}/download/${token}`;
+    const shareLink = `${req.protocol}://${req.get("host")}/download/${file.token}`;
 
     res.send(shareLink);
   } catch (error) {
@@ -215,7 +205,6 @@ module.exports.downloadToken_get = async (req, res) => {
 
 module.exports.disableShareLink_post = async (req, res) => {
   try {
-    // console.log('check');
     const fileId = req.params.fileId;
     const file = await File.findOne({ _id: fileId, userId: req.userId });
 
@@ -223,12 +212,8 @@ module.exports.disableShareLink_post = async (req, res) => {
       return res.status(404).send("File not found");
     }
 
-    if (!file.sharedLinkActive) {
-      return res.status(400).send("File is not shared");
-    }
-
     file.sharedLinkActive = false;
-    file.token = undefined;
+    file.token = uuidv4();
     await file.save();
 
     res.send("Sharable link disabled");
@@ -240,13 +225,11 @@ module.exports.disableShareLink_post = async (req, res) => {
 
 // get Active Links
 module.exports.activeLinks_get = async (req, res) => {
-  // console.log(req.userId);
   try {
     const files = await File.find({
       userId: req.userId,
       sharedLinkActive: true,
     });
-    // console.log(files);
     const activeLinks = files.map((file) => {
       return {
         fileName: file.originalName,
@@ -285,7 +268,6 @@ module.exports.delete_get = async (req, res) => {
     file.shared = false;
     file.sharedWith.splice(0, file.sharedWith.length);
     file.sharedLinkActive = false;
-    file.token = null;
     await file.save();
 
     res.send("File moved to recycle bin");
@@ -369,11 +351,11 @@ const deleteExpiredFiles = async () => {
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
   // find all files with deletedAt value older than thirtyDaysAgo
-  const file = await File.findOne({ deletedAt: { $lt: thirtyDaysAgo } });
+  const file = await File.find({ deletedAt: { $lt: thirtyDaysAgo } });
 
   // Delete the file from the filesystem
   for (const i = 0; i < file.length; i++) {
-    const filePath = path.join(__dirname, file[i].filePath);
+    const filePath = path.join(file[i].filePath);
     fs.unlinkSync(filePath);
   }
 

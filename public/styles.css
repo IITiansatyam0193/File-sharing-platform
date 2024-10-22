@@ -18,6 +18,7 @@ ul{
 }
 a{
   text-decoration: none;
+  cursor: pointer;
 }
 nav{
   display: flex;
@@ -41,9 +42,7 @@ nav li a{
   letter-spacing: 2px;
 }
 .btn{
-  border-radius: 36px;
-  background: crimson;
-  color: white;
+  text-decoration: underline;
 }
 form h2{
   font-size: 2.4em;
@@ -81,6 +80,7 @@ button{
   display: block;
   padding: 10px 16px;
   letter-spacing: 2px;
+  cursor: pointer;
 }
 .error{
   color: #ff0099;
@@ -106,7 +106,10 @@ header h3{
   margin-left: 2px;
   color: #999;
 }
-header .btn{
+header a{
+  border-radius: 36px;
+  background: crimson;
+  color: white;
   margin-top: 20px;
   padding: 12px 18px;
   text-transform: uppercase;
